@@ -4,7 +4,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
-import next from "next";
 import { connectDB } from "./config/db.js";
 
 // ✅ Importation des routes
@@ -22,18 +21,13 @@ connectDB();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PORT = process.env.PORT || 5000;
-const dev = process.env.NODE_ENV !== "production";
-
-// 🧠 Préparation du serveur Next.js (frontend)
-const nextApp = next({ dev });
-const handle = nextApp.getRequestHandler();
 
 // 🚀 Express app
 const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: dev ? "http://localhost:3000" : "*",
+    origin: "*", // tu peux restreindre à ton domaine plus tard
   })
 );
 
@@ -48,15 +42,11 @@ app.use("/api/actus", actusRoutes);
 app.use("/api/auth", authRoutes);
 
 // ✅ Route test
-app.get("/api/test", (req, res) => {
-  res.json({ message: "API OK ✅ Le serveur fonctionne bien !" });
+app.get("/", (req, res) => {
+  res.json({ message: "✅ API Club Basket Oran fonctionnelle !" });
 });
 
-// ⚡ Intégration du frontend Next.js
-nextApp.prepare().then(() => {
-  app.all("*", (req, res) => handle(req, res));
-
-  app.listen(PORT, () => {
-    console.log(`✅ Serveur Express + Next.js lancé sur le port ${PORT}`);
-  });
+// 🚀 Lancement du serveur
+app.listen(PORT, () => {
+  console.log(`✅ Serveur backend lancé sur le port ${PORT}`);
 });
